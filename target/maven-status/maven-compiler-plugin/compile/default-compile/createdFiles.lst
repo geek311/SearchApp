@@ -1,0 +1,6 @@
+com\mycompany\LogUI\ViewObjects.class
+com\mycompany\LogUI\HBaseBean.class
+com\mycompany\LogUI\LNATableService.class
+com\mycompany\LogUI\ManifestRecord.class
+com\mycompany\LogUI\MetadataObjects.class
+com\mycompany\LogUI\HBaseTableObj.class

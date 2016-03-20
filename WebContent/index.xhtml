@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+<h:head>
+	<h:outputStylesheet library="css" name="table-style.css" />
+	<h:outputStylesheet library="css" name="app-style.css" />
+</h:head>
+<h:body>
+
+	<h:form>
+		<div id="appHeader" >
+			<h1>Hadoop Archival State</h1>			
+		</div>
+		<p:spacer height="30"></p:spacer>
+		<p:growl id="growl" />
+		<h:panelGrid columns="7" layout="grid" cellpadding="8">
+			<p:outputLabel value="Date range" styleClass="label"></p:outputLabel>
+			<p:calendar styleClass="customTxtWidth150px"></p:calendar>
+			<p:calendar></p:calendar>
+			<p:outputLabel value="Status" styleClass="label"/>
+			<p:selectOneMenu id="selectStatus"
+				value="#{viewObjects.selectStatus}" style="width:175px">
+				<f:selectItem itemLabel="Ingestion Successful"
+					itemValue="Ingestion Successful"></f:selectItem>
+				<f:selectItem itemLabel="HDFS Ingested" itemValue="HDFS Ingested"></f:selectItem>
+				<f:selectItem itemLabel="Solr HBase Ingested"
+					itemValue="Solr HBase Ingested"></f:selectItem>
+				<f:selectItem itemLabel="MR Failed" itemValue="MR Failed"></f:selectItem>
+			</p:selectOneMenu>
+
+
+			<p:selectBooleanCheckbox value="#{viewObjects.value1}" />
+			<p:outputLabel value="Show DBs with PI" styleClass="label"/>
+		</h:panelGrid>
+		<br />
+		
+		<p:commandButton value="Populate DataTable" style="font-size:15px; font-weight: none"
+			actionListener="#{viewObjects.showDT}" update="@form" />
+
+        &nbsp;
+            <p:commandButton value="Show Stats" update="display" style="font-size:15px; font-weight: none"
+			oncomplete="PF('StatsDlg').show()" />
+
+		<p:dialog header="Ingestion Staistics" modal="true" resizable="false"
+			showEffect="fade" widgetVar="StatsDlg">
+			<h:panelGrid columns="4" id="display">
+				<p:chart type="pie" model="#{viewObjects.pieModel1}"
+					style="width:500px;height:400px" />
+				<br />
+				<br />
+				<p:chart type="bar" model="#{viewObjects.barModel}"
+					style="height:400px" />
+			</h:panelGrid>
+		</p:dialog>
+
+&nbsp;
+<p:commandButton value="Show Progress" type="button" style="font-size:15px; font-weight: none"
+			onclick="PF('pbAjax').start();PF('startButton2').disable();"
+			widgetVar="startButton2" />
+		<br />
+		<br />
+		
+		
+		<br></br>
+		<p:dataTable id="resultsTable" var="record"
+			value="#{viewObjects.records}" rendered="#{viewObjects.showTable}">
+			<p:column headerText="DBGUID">
+				<p:link outcome="metadata" value="#{record.DBGUID}">
+				   <f:param name="DBGUID" value="#{record.DBGUID}" />
+				</p:link>
+			</p:column>
+
+			<p:column headerText="DBName">
+				<h:outputText value="#{record.DBName}" />
+			</p:column>
+
+			<p:column headerText="Scheduled">
+				<h:outputText value="#{record.scheduled}" />
+			</p:column>
+
+			<p:column headerText="Docs">
+				<h:outputText value="#{record.numDocs}" />
+			</p:column>
+			<p:column headerText="Status">
+				<p:progressBar widgetVar="pbAjax" ajax="true"
+					value="#{viewObjects.progress}" labelTemplate="{value}%"
+					styleClass="animated" global="false">
+					<p:ajax event="complete" listener="#{viewObjects.onComplete}"
+						oncomplete="PF('startButton2').enable()" />
+				</p:progressBar>
+			</p:column>
+		</p:dataTable>
+	</h:form>
+
+	<style type="text/css">
+.animated .ui-progressbar-value {
+	background-image: url("resources/pbar-ani.gif");
+}
+</style>
+
+	<script type="text/javascript">
+		function start() {
+			PF('startButton1').disable();
+
+			window['progress'] = setInterval(
+					function() {
+						var pbClient = PF('pbClient'), oldValue = pbClient
+								.getValue(), newValue = oldValue + 10;
+
+						pbClient.setValue(pbClient.getValue() + 10);
+
+						if (newValue === 100) {
+							clearInterval(window['progress']);
+						}
+
+					}, 1000);
+		}
+
+		function cancel() {
+			clearInterval(window['progress']);
+			PF('pbClient').setValue(0);
+			PF('startButton1').enable();
+		}
+	</script>
+
+</h:body>
+
+
+</html>
