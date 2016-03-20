@@ -23,6 +23,9 @@ import org.apache.hadoop.hbase.client.Scan;
 import org.apache.hadoop.hbase.client.Table;
 import org.apache.hadoop.hbase.util.Bytes;
 
+/**
+ * Bean backing the index.html 
+ */
 @ManagedBean(name = "HBaseBean", eager = true)
 @SessionScoped
 public class HBaseBean {
