@@ -31,7 +31,7 @@ public class HBaseBean {
 		process();
 		return rows;
 	}
-
+ 
 	public void setRows(List<HBaseTableObj> rows) {
 		this.rows = rows;
 	}
